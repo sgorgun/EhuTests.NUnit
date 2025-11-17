@@ -2,8 +2,8 @@ using EhuTests.NUnit.Core;
 using EhuTests.NUnit.Pages;
 using EhuTests.NUnit.TestData;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using OpenQA.Selenium;
+using Shouldly;
 
 namespace EhuTests.NUnit.Tests;
 
@@ -19,7 +19,7 @@ public class EhuUiTests : BaseTest
         var home = new HomePage(Driver, RuntimeConfig.Settings.Urls.BaseEn).Open();
         home.Header.OpenAbout();
         TestLog.Logger.Debug("Navigated to {Url}", Driver.Url);
-        StringAssert.Contains("/about", Driver.Url.ToLower());
+        Driver.Url.ToLower().ShouldContain("/about");
         TestLog.Logger.Information("About page assertion passed.");
     }
 
@@ -30,13 +30,11 @@ public class EhuUiTests : BaseTest
         var home = new HomePage(Driver, RuntimeConfig.Settings.Urls.BaseEn).Open();
         home.Header.SwitchToLt();
         TestLog.Logger.Debug("Current URL after switch {Url}", Driver.Url);
-        StringAssert.StartsWith(RuntimeConfig.Settings.Urls.BaseLt, Driver.Url);
+        Driver.Url.ShouldStartWith(RuntimeConfig.Settings.Urls.BaseLt);
         TestLog.Logger.Information("Language switch assertion passed.");
     }
 
-    [TestCaseSource(typeof(SearchData), nameof(SearchData.Terms)),
-     Category("Search"),
-     RetryOnFailure(3)]
+    [TestCaseSource(typeof(SearchData), nameof(SearchData.Terms)), Category("Search"), RetryOnFailure(3)]
     public void Search_Should_Return_Results(string term)
     {
         TestLog.Logger.Information("Starting search test for term {Term}", term);
@@ -47,8 +45,7 @@ public class EhuUiTests : BaseTest
         var keyword = term.Split(' ')[0].ToLower();
         var contains = results.ContainsText(keyword);
         TestLog.Logger.Debug("Results contain keyword {Keyword}: {Contains}", keyword, contains);
-        Assert.That(contains, Is.True,
-            $"Expected search results to contain '{term}'.");
+        contains.ShouldBeTrue($"Expected search results to contain '{term}'.");
         TestLog.Logger.Information("Search assertion passed for {Term}", term);
     }
 }
