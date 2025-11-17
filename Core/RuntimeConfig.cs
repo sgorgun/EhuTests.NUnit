@@ -12,5 +12,6 @@ public static class RuntimeConfig
         if (_initialized) return;
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _initialized = true;
+        TestLog.Logger.Information("RuntimeConfig initialized.");
     }
 }
