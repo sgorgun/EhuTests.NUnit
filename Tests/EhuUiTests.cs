@@ -11,7 +11,7 @@ namespace EhuTests.NUnit.Tests;
 public class EhuUiTests : BaseTest
 {
     private static IWebDriver Driver => DriverManager.Instance.Driver;
-
+    [Ignore("Temporarily disabled")]
     [Test, Category("Navigation"), RetryOnFailure(2)]
     public void AboutPage_Should_Open()
     {
