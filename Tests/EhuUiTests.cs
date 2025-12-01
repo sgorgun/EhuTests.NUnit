@@ -11,41 +11,66 @@ namespace EhuTests.NUnit.Tests;
 public class EhuUiTests : BaseTest
 {
     private static IWebDriver Driver => DriverManager.Instance.Driver;
-    [Ignore("Temporarily disabled")]
+    
     [Test, Category("Navigation"), RetryOnFailure(2)]
     public void AboutPage_Should_Open()
     {
-        TestLog.Logger.Information("Starting About page navigation test.");
+        ExtentTestLogger.Step("Navigate to home page");
         var home = new HomePage(Driver, RuntimeConfig.Settings.Urls.BaseEn).Open();
+        ExtentTestLogger.NavigatedTo(Driver.Url);
+        
+        ExtentTestLogger.Step("Click on About link in header");
         home.Header.OpenAbout();
-        TestLog.Logger.Debug("Navigated to {Url}", Driver.Url);
-        Driver.Url.ToLower().ShouldContain("/about");
-        TestLog.Logger.Information("About page assertion passed.");
+        
+        ExtentTestLogger.Warning("Test marked as inconclusive - temporarily disabled for investigation");
+        Assert.Inconclusive("Test temporarily disabled - needs investigation");
+        
+        ExtentTestLogger.Step("Verify URL contains '/about'");
+        var currentUrl = Driver.Url.ToLower();
+        ExtentTestLogger.Info($"Current URL: {currentUrl}");
+        currentUrl.ShouldContain("/about");
+        ExtentTestLogger.Pass("About page opened successfully");
     }
 
     [Test, Category("Localization"), RetryOnFailure(2)]
     public void Language_Should_Switch_To_LT()
     {
-        TestLog.Logger.Information("Starting language switch test.");
+        ExtentTestLogger.Step("Navigate to home page (English)");
         var home = new HomePage(Driver, RuntimeConfig.Settings.Urls.BaseEn).Open();
+        ExtentTestLogger.NavigatedTo(Driver.Url);
+        
+        ExtentTestLogger.Step("Click on LT language link");
         home.Header.SwitchToLt();
-        TestLog.Logger.Debug("Current URL after switch {Url}", Driver.Url);
-        Driver.Url.ShouldStartWith(RuntimeConfig.Settings.Urls.BaseLt);
-        TestLog.Logger.Information("Language switch assertion passed.");
+        
+        ExtentTestLogger.Step("Verify URL switched to Lithuanian version");
+        var currentUrl = Driver.Url;
+        ExtentTestLogger.TestData("Expected Base URL", RuntimeConfig.Settings.Urls.BaseLt);
+        ExtentTestLogger.TestData("Actual URL", currentUrl);
+        currentUrl.ShouldStartWith(RuntimeConfig.Settings.Urls.BaseLt);
+        ExtentTestLogger.Pass("Language switched to Lithuanian successfully");
     }
 
     [TestCaseSource(typeof(SearchData), nameof(SearchData.Terms)), Category("Search"), RetryOnFailure(3)]
     public void Search_Should_Return_Results(string term)
     {
-        TestLog.Logger.Information("Starting search test for term {Term}", term);
+        ExtentTestLogger.TestData("Search Term", term);
+        
+        ExtentTestLogger.Step("Navigate to home page");
         var home = new HomePage(Driver, RuntimeConfig.Settings.Urls.BaseEn).Open();
+        ExtentTestLogger.NavigatedTo(Driver.Url);
+        
+        ExtentTestLogger.Step($"Perform search for: '{term}'");
         home.Header.Search(term);
-        TestLog.Logger.Debug("Search performed, current URL {Url}", Driver.Url);
+        ExtentTestLogger.Info($"Search URL: {Driver.Url}");
+        
+        ExtentTestLogger.Step("Verify search results contain the search term");
         var results = new SearchResultsPage(Driver);
         var keyword = term.Split(' ')[0].ToLower();
+        ExtentTestLogger.TestData("Keyword to verify", keyword);
+        
         var contains = results.ContainsText(keyword);
-        TestLog.Logger.Debug("Results contain keyword {Keyword}: {Contains}", keyword, contains);
+        ExtentTestLogger.Assert($"Search results contain '{keyword}'", contains);
         contains.ShouldBeTrue($"Expected search results to contain '{term}'.");
-        TestLog.Logger.Information("Search assertion passed for {Term}", term);
+        ExtentTestLogger.Pass($"Search results verified for term '{term}'");
     }
 }
