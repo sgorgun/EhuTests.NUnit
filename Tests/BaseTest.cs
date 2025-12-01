@@ -10,12 +10,15 @@ namespace EhuTests.NUnit.Tests;
 public abstract class BaseTest
 {
     private static TestSettings Settings = default!;
+    private DateTime _testStartUtc;
 
     protected static TestSettings TestSettings => Settings;
 
     [OneTimeSetUp]
     public void LoadConfig()
     {
+        ReportAggregator.SuiteStarted();
+
         var config = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.test.json", optional: false)
@@ -32,6 +35,7 @@ public abstract class BaseTest
     [SetUp]
     public void SetUp()
     {
+        _testStartUtc = DateTime.UtcNow;
         TestLog.Logger.Debug("Test SetUp starting for {TestName}", TestContext.CurrentContext.Test.Name);
 
         var builder = OptionsBuilder.ForChrome()
@@ -63,12 +67,16 @@ public abstract class BaseTest
     [TearDown]
     public void TearDown()
     {
-        var result = TestContext.CurrentContext.Result;
-        var testName = TestContext.CurrentContext.Test.Name;
-        if (result.FailCount > 0)
+        var ctx = TestContext.CurrentContext;
+        var status = ctx.Result.Outcome.Status.ToString();
+        var testName = ctx.Test.Name;
+        var durationMs = (DateTime.UtcNow - _testStartUtc).TotalMilliseconds;
+        ReportAggregator.Add(testName, status, durationMs);
+
+        if (ctx.Result.FailCount > 0)
         {
             TestLog.Logger.Error("Test {TestName} failed. Status={Status} Message={Message}",
-                testName, result.Outcome.Status, result.Message);
+                testName, ctx.Result.Outcome.Status, ctx.Result.Message);
         }
         else
         {
@@ -82,6 +90,10 @@ public abstract class BaseTest
     [OneTimeTearDown]
     public void GlobalTearDown()
     {
+        var outDir = Path.Combine(AppContext.BaseDirectory, "reports");
+        ReportAggregator.WriteSummary(outDir);
+        TestLog.Logger.Information("Summary report written to {Dir}", outDir);
+
         TestLog.Logger.Information("All tests finished.");
         TestLog.Shutdown();
     }
