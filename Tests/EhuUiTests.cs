@@ -22,9 +22,6 @@ public class EhuUiTests : BaseTest
         ExtentTestLogger.Step("Click on About link in header");
         home.Header.OpenAbout();
         
-        ExtentTestLogger.Warning("Test marked as inconclusive - temporarily disabled for investigation");
-        Assert.Inconclusive("Test temporarily disabled - needs investigation");
-        
         ExtentTestLogger.Step("Verify URL contains '/about'");
         var currentUrl = Driver.Url.ToLower();
         ExtentTestLogger.Info($"Current URL: {currentUrl}");
@@ -38,10 +35,10 @@ public class EhuUiTests : BaseTest
         ExtentTestLogger.Step("Navigate to home page (English)");
         var home = new HomePage(Driver, RuntimeConfig.Settings.Urls.BaseEn).Open();
         ExtentTestLogger.NavigatedTo(Driver.Url);
-        
+
         ExtentTestLogger.Step("Click on LT language link");
         home.Header.SwitchToLt();
-        
+
         ExtentTestLogger.Step("Verify URL switched to Lithuanian version");
         var currentUrl = Driver.Url;
         ExtentTestLogger.TestData("Expected Base URL", RuntimeConfig.Settings.Urls.BaseLt);
