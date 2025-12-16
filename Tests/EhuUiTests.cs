@@ -27,6 +27,9 @@ public class EhuUiTests : BaseTest
         ExtentTestLogger.Info($"Current URL: {currentUrl}");
         currentUrl.ShouldContain("/about");
         ExtentTestLogger.Pass("About page opened successfully");
+        TestLog.Logger.Debug("Navigated to {Url}", Driver.Url);
+        Driver.Url.ToLower().ShouldContain("/about");
+        TestLog.Logger.Information("About page assertion passed.");
     }
 
     [Test, Category("Localization"), RetryOnFailure(2)]
@@ -45,6 +48,9 @@ public class EhuUiTests : BaseTest
         ExtentTestLogger.TestData("Actual URL", currentUrl);
         currentUrl.ShouldStartWith(RuntimeConfig.Settings.Urls.BaseLt);
         ExtentTestLogger.Pass("Language switched to Lithuanian successfully");
+        TestLog.Logger.Debug("Current URL after switch {Url}", Driver.Url);
+        Driver.Url.ShouldStartWith(RuntimeConfig.Settings.Urls.BaseLt);
+        TestLog.Logger.Information("Language switch assertion passed.");
     }
 
     [TestCaseSource(typeof(SearchData), nameof(SearchData.Terms)), Category("Search"), RetryOnFailure(3)]
@@ -69,5 +75,8 @@ public class EhuUiTests : BaseTest
         ExtentTestLogger.Assert($"Search results contain '{keyword}'", contains);
         contains.ShouldBeTrue($"Expected search results to contain '{term}'.");
         ExtentTestLogger.Pass($"Search results verified for term '{term}'");
+        TestLog.Logger.Debug("Results contain keyword {Keyword}: {Contains}", keyword, contains);
+        contains.ShouldBeTrue($"Expected search results to contain '{term}'.");
+        TestLog.Logger.Information("Search assertion passed for {Term}", term);
     }
 }
