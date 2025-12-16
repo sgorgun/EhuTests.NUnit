@@ -26,12 +26,18 @@
     <PackageReference Include="Shouldly" Version="4.2.1" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.6" />
+    <PackageReference Include="Reqnroll" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.test.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Features\*.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\" />
   </ItemGroup>
 
 </Project>
